@@ -1,0 +1,166 @@
+---
+// Fixed header: the logo, the section links, the "Find a shop" action and, on a phone, a full-screen menu (<dialog>).
+import { nav } from "@/content/site";
+import Icon from "@/components/Icon.astro";
+import Logo from "@/components/Logo.astro";
+---
+
+<header class="site-header" data-header>
+  <div class="container-page flex h-[var(--header-h)] items-center justify-between gap-6">
+    <a href="#main" class="rounded-lg" aria-label="Velluto, back to the top">
+      <Logo />
+    </a>
+
+    <nav aria-label="Main" class="hidden lg:block">
+      <ul class="flex items-center gap-1">
+        {nav.map((link) => (
+          <li>
+            <a class="nav-link" href={link.href}>
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="flex items-center gap-2">
+      <a class="btn btn-primary hidden !min-h-11 !px-5 sm:inline-flex" href="#shops">
+        Find a shop
+        <Icon name="arrow" size={18} />
+      </a>
+      <button
+        type="button"
+        class="icon-btn lg:!hidden"
+        aria-haspopup="dialog"
+        aria-controls="site-menu"
+        data-menu-open
+      >
+        <Icon name="menu" size={22} />
+        <span class="sr-only">Menu</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<dialog id="site-menu" class="menu" aria-labelledby="site-menu-title">
+  <div class="container-page flex min-h-full flex-col py-4">
+    <div class="flex h-[calc(var(--header-h)-1rem)] items-center justify-between">
+      <Logo />
+      <button type="button" class="icon-btn" data-dialog-close>
+        <Icon name="close" size={22} />
+        <span class="sr-only">Close the menu</span>
+      </button>
+    </div>
+    <h2 id="site-menu-title" class="sr-only">
+      Menu
+    </h2>
+    <nav aria-label="Menu" class="mt-10 flex-1">
+      <ul class="grid gap-2">
+        {nav.map((link, i) => (
+          <li>
+            <a class="menu-link" href={link.href} data-dialog-close>
+              <span class="menu-link__num" aria-hidden="true">
+                0{i + 1}
+              </span>
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+    <a class="btn btn-primary mt-8 w-full" href="#shops" data-dialog-close>
+      Find a shop
+      <Icon name="arrow" size={18} />
+    </a>
+  </div>
+</dialog>
+
+<style>
+  .site-header {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 50;
+    transition:
+      background-color 0.3s,
+      box-shadow 0.3s,
+      transform 0.45s var(--ease-out-soft);
+  }
+
+  .site-header[data-scrolled] {
+    background: rgb(255 248 241 / 0.82);
+    backdrop-filter: saturate(1.4) blur(14px);
+    box-shadow: 0 1px 0 var(--color-line);
+  }
+
+  /* Slides away while reading down, back on the first scroll up; never while it holds the focus. */
+  .site-header[data-hidden]:not(:focus-within) {
+    transform: translateY(-100%);
+  }
+
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0 1rem;
+    border-radius: 999px;
+    font-weight: 600;
+    transition: background-color 0.2s;
+  }
+
+  .nav-link:hover,
+  .nav-link[aria-current="true"] {
+    background: rgb(255 211 221 / 0.7);
+  }
+
+  .menu {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: var(--color-cream);
+    color: var(--color-cocoa);
+  }
+
+  .menu::backdrop {
+    background: transparent;
+  }
+
+  .menu-link {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.6rem 0;
+    font-family: var(--font-display);
+    font-variation-settings: "SOFT" 100;
+    font-weight: 600;
+    font-size: clamp(2.5rem, 12vw, 4rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .menu-link__num {
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--color-raspberry-deep);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .menu[open] {
+      animation: menu-in 0.5s var(--ease-out-soft);
+    }
+
+    @keyframes menu-in {
+      from {
+        clip-path: circle(0% at calc(100% - 2.5rem) 2.25rem);
+      }
+      to {
+        clip-path: circle(150% at calc(100% - 2.5rem) 2.25rem);
+      }
+    }
+  }
+</style>

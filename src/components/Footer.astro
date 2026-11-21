@@ -1,0 +1,182 @@
+---
+// Closing line in giant type, the links, the contact and the note that the content is a sample.
+import { footer, nav, site, telHref } from "@/content/site";
+import Icon from "@/components/Icon.astro";
+import Logo from "@/components/Logo.astro";
+
+const year = new Date().getFullYear();
+const socialIcon = { Instagram: "instagram", TikTok: "tiktok", Facebook: "facebook" } as const;
+---
+
+<footer class="footer on-dark">
+  <div class="container-page">
+    <p class="footer__line" aria-hidden="true">
+      <span>{footer.line[0]}</span>
+      <span class="footer__accent">{footer.line[1]}</span>
+    </p>
+
+    <div class="footer__grid">
+      <div>
+        <Logo tone="light" />
+        <p class="mt-4 max-w-xs text-[rgb(255_248_241/0.78)]">{footer.line.join(" ")}.</p>
+      </div>
+
+      <nav aria-label="Footer">
+        <h2 class="footer__heading">Explore</h2>
+        <ul class="footer__links">
+          {nav.map((link) => (
+            <li>
+              <a href={link.href}>{link.label}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <div>
+        <h2 class="footer__heading">Talk to us</h2>
+        <ul class="footer__links">
+          <li>
+            <a href={telHref(footer.phone)}>{footer.phone}</a>
+          </li>
+          <li>
+            <a href={`mailto:${footer.email}`}>{footer.email}</a>
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="footer__heading">Follow</h2>
+        <ul class="footer__social">
+          {footer.social.map((link) => (
+            <li>
+              <a
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="icon-btn footer__icon"
+              >
+                <Icon name={socialIcon[link.label as keyof typeof socialIcon]} size={20} />
+                <span class="sr-only">{link.label} (opens in a new tab)</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <p>
+        © {year} {site.name}. {footer.note}
+      </p>
+      <a href="#main" class="footer__top">
+        Back to the top
+        <Icon name="arrow" size={16} class="-rotate-90" />
+      </a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: var(--color-cocoa);
+    color: var(--color-cream);
+    padding-top: clamp(4rem, 9vw, 7rem);
+    padding-bottom: 2rem;
+    overflow: clip;
+  }
+
+  .footer__line {
+    display: grid;
+    font-family: var(--font-display);
+    font-variation-settings:
+      "SOFT" 100,
+      "WONK" 1;
+    font-weight: 700;
+    font-size: clamp(2.6rem, 9.2vw, 8.5rem);
+    line-height: 0.92;
+    letter-spacing: -0.035em;
+  }
+
+  .footer__accent {
+    font-style: italic;
+    color: var(--color-candy);
+  }
+
+  .footer__grid {
+    display: grid;
+    gap: 2.5rem;
+    margin-top: clamp(3rem, 7vw, 5rem);
+    padding-top: 2.5rem;
+    border-top: 1px solid rgb(255 248 241 / 0.16);
+  }
+
+  .footer__heading {
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-candy);
+  }
+
+  .footer__links {
+    display: grid;
+    margin-top: 0.75rem;
+  }
+
+  .footer__links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.5rem;
+    font-weight: 500;
+  }
+
+  .footer__links a:hover,
+  .footer__top:hover {
+    color: var(--color-candy);
+  }
+
+  .footer__social {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 1rem;
+  }
+
+  .footer__icon {
+    background: transparent;
+    color: var(--color-cream);
+    box-shadow: inset 0 0 0 1.5px rgb(255 248 241 / 0.35);
+  }
+
+  .footer__icon:hover {
+    background: var(--color-raspberry);
+  }
+
+  .footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgb(255 248 241 / 0.16);
+    font-size: 0.875rem;
+    color: rgb(255 248 241 / 0.75);
+  }
+
+  .footer__top {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 2.75rem;
+    font-weight: 600;
+    color: var(--color-cream);
+  }
+
+  @media (min-width: 768px) {
+    .footer__grid {
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+    }
+  }
+</style>

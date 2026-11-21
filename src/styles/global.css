@@ -1,0 +1,285 @@
+@import "tailwindcss";
+
+/* Design tokens: one palette, no theme switch (see docs/frontend.md). Contrast of every text pair is in that file. */
+@theme {
+  --color-cream: #fff8f1;
+  --color-cream-deep: #fbeee0;
+  --color-cocoa: #2a1a1f;
+  --color-cocoa-soft: #6b5560;
+  --color-raspberry: #d31342;
+  --color-raspberry-deep: #a30f33;
+  --color-blush: #ffd3dd;
+  --color-candy: #ff9db4;
+  --color-line: #ecd9cd;
+
+  --font-display: "Fraunces Variable", "Iowan Old Style", Georgia, serif;
+  --font-sans: "DM Sans Variable", ui-sans-serif, system-ui, sans-serif;
+
+  --ease-scoop: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  :root {
+    --header-h: 4.5rem;
+    --focus: var(--color-cocoa);
+    color-scheme: light;
+    scroll-padding-top: calc(var(--header-h) + 1rem);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--color-cream);
+    color: var(--color-cocoa);
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: clip;
+  }
+
+  /* A faint paper grain over the whole page; it never takes clicks. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
+    border-radius: 0.5rem;
+  }
+
+  ::selection {
+    background: var(--color-raspberry);
+    color: #fff;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-variation-settings:
+      "SOFT" 100,
+      "WONK" 0;
+    font-weight: 600;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+}
+
+@layer components {
+  .container-page {
+    width: min(100% - 2.5rem, 80rem);
+    margin-inline: auto;
+  }
+
+  .section {
+    padding-block: clamp(5rem, 11vw, 9.5rem);
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-raspberry-deep);
+  }
+
+  .eyebrow::before {
+    content: "";
+    width: 1.75rem;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+  }
+
+  .display {
+    font-size: clamp(2.6rem, 6.4vw, 5.75rem);
+  }
+
+  .lead {
+    font-size: clamp(1.0625rem, 1.4vw, 1.25rem);
+    line-height: 1.6;
+    color: var(--color-cocoa-soft);
+  }
+
+  .btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    min-height: 3.25rem;
+    padding: 0 1.6rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1;
+    white-space: nowrap;
+    transition:
+      transform 0.35s var(--ease-scoop),
+      background-color 0.2s,
+      color 0.2s,
+      box-shadow 0.35s var(--ease-out-soft);
+  }
+
+  .btn svg {
+    transition: transform 0.35s var(--ease-scoop);
+  }
+
+  .btn:hover svg {
+    transform: translateX(3px);
+  }
+
+  .btn-primary {
+    background: var(--color-raspberry);
+    color: #fff;
+    box-shadow: 0 10px 24px -10px rgb(211 19 66 / 0.65);
+  }
+
+  .btn-primary:hover {
+    background: var(--color-raspberry-deep);
+    transform: translateY(-2px);
+    box-shadow: 0 16px 30px -12px rgb(163 15 51 / 0.7);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--color-cocoa);
+    box-shadow: inset 0 0 0 2px var(--color-cocoa);
+  }
+
+  .btn-ghost:hover {
+    background: var(--color-cocoa);
+    color: var(--color-cream);
+  }
+
+  .btn-light {
+    background: var(--color-cream);
+    color: var(--color-raspberry-deep);
+  }
+
+  .btn-light:hover {
+    background: #fff;
+    transform: translateY(-2px);
+  }
+
+  .on-dark {
+    --focus: var(--color-cream);
+  }
+
+  .sr-only-focusable:not(:focus) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* Native dialogs: the product details, the map and the phone menu. */
+  .modal {
+    margin: auto;
+    width: min(100% - 2rem, 40rem);
+    max-height: min(100% - 2rem, 46rem);
+    padding: 0;
+    border: 0;
+    border-radius: 1.75rem;
+    background: var(--color-cream);
+    color: var(--color-cocoa);
+    box-shadow: 0 40px 80px -30px rgb(42 26 31 / 0.55);
+    overscroll-behavior: contain;
+  }
+
+  .modal::backdrop {
+    background: rgb(42 26 31 / 0.55);
+    backdrop-filter: blur(6px);
+  }
+
+  .icon-btn {
+    display: inline-grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 999px;
+    background: var(--color-cream);
+    color: var(--color-cocoa);
+    box-shadow: inset 0 0 0 1.5px var(--color-line);
+    transition: background-color 0.2s;
+  }
+
+  .icon-btn:hover {
+    background: var(--color-blush);
+  }
+}
+
+/* Motion: only when the visitor has not asked for less of it. The `motion` class is set before the first paint. */
+@media (prefers-reduced-motion: no-preference) {
+  .modal[open] {
+    animation: modal-in 0.45s var(--ease-out-soft);
+  }
+
+  .modal[open]::backdrop {
+    animation: fade-in 0.3s ease-out;
+  }
+
+  @keyframes modal-in {
+    from {
+      opacity: 0;
+      transform: translateY(24px) scale(0.97);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Lenis (smooth scroll) needs these when it is on. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: clip;
+}
