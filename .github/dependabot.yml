@@ -10,6 +10,10 @@ updates:
     cooldown:
       default-days: 7
     open-pull-requests-limit: 5
+    # @types/node follows the Node major in .nvmrc (22); a newer major would allow APIs the runtime lacks
+    ignore:
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
     groups:
       minor-and-patch:
         update-types: [minor, patch]
