@@ -17,8 +17,9 @@
 scoop by scoop, the menu cards stack on top of each other and the brand story unfolds, on a phone as much as on a wide
 screen.
 
-- **The cone scene.** A pinned stage where six flavours land on the cone one after another; the background takes each
-  flavour's colour and the name and note change with it (`src/components/Flavours.astro`, `src/scripts/motion.ts`).
+- **The cone scene.** A pinned stage where the scroll scrubs a 96-frame Blender render: five scoops and a fior di latte
+  swirl fall onto a turning waffle cone; the background takes each flavour's colour and the name and note change with
+  it (`src/components/Flavours.astro`, `src/scripts/motion.ts`).
 - **Stacking menu.** Ice cream, ice coffee and milkshakes as large cards that slide over each other (CSS `sticky`);
   "More about" opens a native `<dialog>` with the details.
 - **Story, numbers, gallery, reviews, shops.** A step-by-step "How it's made" with a filling rail, counters on a dark
@@ -32,9 +33,9 @@ screen.
   end-to-end tests.
 - **Fast.** Static HTML from Astro, images turned into WebP in several widths, self-hosted variable fonts.
 
-> **Status:** the brand, the shops, the prices and the reviews are sample content. The photos come from the earlier
-> `food-brand-landing-page` project; a Blender cone sequence and product renders are planned
-> ([docs/frontend.md](docs/frontend.md#graphics-still-to-make)).
+> **Status:** the brand, the shops, the prices and the reviews are sample content. The cone, its 96-frame sequence and
+> the products are Blender renders ([docs/frontend.md](docs/frontend.md#graphics)); the gallery, the farm and the review
+> photos come from the earlier `food-brand-landing-page` project.
 
 ## Tech stack
 
@@ -101,9 +102,12 @@ src/styles/global.css   design tokens (Tailwind @theme), buttons, dialogs, focus
 src/scripts/main.ts     header, dialogs, lazy map, current section; loads motion.ts when motion is welcome
 src/scripts/motion.ts   Lenis and every GSAP ScrollTrigger scene
 src/assets/             photos, turned into WebP by astro:assets at build time
+public/cone/            the cone frame sequence (desktop and mobile WebP, made by scripts/cone-frames.mjs)
+public/brand/           the vector logo (dark, light) and the mark
 public/                 favicon, Apple touch icon, Open Graph image
 tests/                  Vitest (*.test.ts) and Playwright (e2e/*.spec.ts)
 scripts/health.mjs      live-site check run after a deploy
+scripts/cone-frames.mjs turns the Blender renders into the frames and the hero still
 docs/                   documentation; docs/images/ holds the README images (generated)
 .github/workflows/      deploy.yml: check, build, e2e, publish to GitHub Pages from main
 ```
@@ -131,7 +135,7 @@ English checked by commitlint in a husky hook, Prettier and ESLint on staged fil
 | [docs/repository.md](docs/repository.md) | GitHub description, topics and settings                                |
 
 The README images (`docs/images/`) are made by `tools/readme-images`, profile `gelato-brand-website`; working files
-go to `.scratch/`. Planned 3D renders will live in `blender-projects/gelato-brand-website`.
+go to `.scratch/`. The 3D renders are made in `blender-projects/gelato-brand-website`.
 
 ---
 
