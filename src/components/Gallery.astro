@@ -1,0 +1,103 @@
+---
+// Ten photos in a loose grid; with motion the columns drift at different speeds.
+import { Image } from "astro:assets";
+import { gallery } from "@/content/site";
+
+// The first photo is the large one; the rest fill two columns on each side.
+const [feature, ...rest] = gallery.photos;
+const columns = [rest.slice(0, 3), rest.slice(3, 6), rest.slice(6, 9)];
+const speeds = ["0.12", "-0.1", "0.18"];
+---
+
+<section class="section gallery" aria-labelledby="gallery-title">
+  <div class="container-page">
+    <header class="gallery__head">
+      <p class="eyebrow">{gallery.eyebrow}</p>
+      <h2 id="gallery-title" class="display mt-4">
+        {gallery.title}
+      </h2>
+    </header>
+
+    <ul class="gallery__grid">
+      {feature && (
+        <li class="gallery__feature">
+          <Image
+            src={feature.image}
+            alt={feature.alt}
+            widths={[400, 600, 900]}
+            sizes="(min-width: 1024px) 38vw, 92vw"
+            format="webp"
+            quality={78}
+          />
+        </li>
+      )}
+      {columns.map((column, c) => (
+        <li class="gallery__col" data-parallax={speeds[c]}>
+          <ul class="gallery__stack">
+            {column.map((photo) => (
+              <li>
+                <Image
+                  src={photo.image}
+                  alt={photo.alt}
+                  widths={[200, 300]}
+                  sizes="(min-width: 1024px) 16vw, 31vw"
+                  format="webp"
+                  quality={78}
+                />
+              </li>
+            ))}
+          </ul>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .gallery {
+    background: linear-gradient(var(--color-cream), var(--color-cream-deep));
+    overflow: clip;
+  }
+
+  .gallery__head {
+    margin-bottom: clamp(2.5rem, 6vw, 4rem);
+  }
+
+  /* Phone: the large photo, then each column as a row of three. */
+  .gallery__grid {
+    display: grid;
+    gap: 0.6rem;
+    align-items: start;
+  }
+
+  .gallery__stack {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.6rem;
+  }
+
+  .gallery__grid :global(img) {
+    width: 100%;
+    border-radius: 1.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    .gallery__grid {
+      grid-template-columns: 2.2fr 1fr 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    .gallery__feature {
+      align-self: center;
+    }
+
+    .gallery__col:nth-child(3) {
+      margin-top: 5rem;
+    }
+
+    .gallery__stack {
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+  }
+</style>

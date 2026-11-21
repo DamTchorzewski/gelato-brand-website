@@ -1,0 +1,21 @@
+---
+import Base from "@/layouts/Base.astro";
+import Icon from "@/components/Icon.astro";
+import { withBase } from "@/lib/url";
+---
+
+<Base title="Page not found · Velluto">
+  <section class="section grid min-h-[80svh] place-items-center text-center">
+    <div class="container-page">
+      <p class="eyebrow">Error 404</p>
+      <h1 class="display mx-auto mt-4 max-w-[14ch]">This scoop has melted</h1>
+      <p class="lead mx-auto mt-5 max-w-md">
+        The page you were looking for is not here. The ice cream still is.
+      </p>
+      <a class="btn btn-primary mt-8" href={withBase("")}>
+        Back to the home page
+        <Icon name="arrow" size={18} />
+      </a>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,149 @@
+---
+// Three reviews: side by side on a wide screen, a swipeable row on a phone (scroll-snap, no autoplay).
+import { Image } from "astro:assets";
+import { reviews } from "@/content/site";
+
+const tints = ["#ffd3dd", "#cdeedd", "#ffd9a6"];
+---
+
+<section class="section reviews" aria-labelledby="reviews-title">
+  <div class="container-page">
+    <header class="reviews__head">
+      <p class="eyebrow">{reviews.eyebrow}</p>
+      <h2 id="reviews-title" class="display mt-4">
+        {reviews.title}
+      </h2>
+    </header>
+  </div>
+
+  {/* On a phone the list scrolls sideways: it is focusable so the keyboard can scroll it too. */}
+  {/* eslint-disable-next-line astro/jsx-a11y/no-noninteractive-tabindex */}
+  <ul class="reviews__row" tabindex="0" aria-label="Reviews, scroll sideways for more">
+    {reviews.items.map((review, i) => (
+      <li class="reviews__card" style={`--tint:${tints[i % tints.length]}`} data-reveal>
+        <figure>
+          <blockquote class="reviews__quote">
+            <p>{review.quote}</p>
+          </blockquote>
+          <figcaption class="reviews__who">
+            <Image
+              src={review.avatar}
+              alt=""
+              width={56}
+              height={56}
+              densities={[1, 2, 3]}
+              format="webp"
+              class="reviews__avatar"
+            />
+            <span>
+              <strong>{review.name}</strong>
+              <span class="reviews__city">{review.city}</span>
+            </span>
+          </figcaption>
+        </figure>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .reviews__head {
+    margin-bottom: clamp(2.5rem, 6vw, 4rem);
+  }
+
+  .reviews__row {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: min(85%, 22rem);
+    gap: 1rem;
+    padding: 1rem max(1.25rem, (100% - 80rem) / 2) 2rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: max(1.25rem, (100% - 80rem) / 2);
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+  }
+
+  .reviews__row:focus-visible {
+    outline-offset: -6px;
+  }
+
+  .reviews__card {
+    scroll-snap-align: start;
+    display: flex;
+    border-radius: 1.75rem;
+    background: var(--tint);
+    padding: 2rem 1.75rem 1.75rem;
+  }
+
+  .reviews__card figure {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .reviews__quote {
+    font-family: var(--font-display);
+    font-variation-settings: "SOFT" 100;
+    font-size: 1.45rem;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+
+  .reviews__quote p::before {
+    content: "“";
+    display: block;
+    height: 2.6rem;
+    font-size: 4.5rem;
+    line-height: 1;
+    font-weight: 700;
+    color: var(--color-raspberry);
+  }
+
+  .reviews__who {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    margin-top: auto;
+  }
+
+  .reviews__who > span {
+    display: grid;
+  }
+
+  .reviews__avatar {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgb(255 255 255 / 0.8);
+  }
+
+  .reviews__city {
+    color: var(--color-cocoa-soft);
+    font-size: 0.9375rem;
+  }
+
+  @media (min-width: 960px) {
+    .reviews__row {
+      grid-auto-flow: row;
+      grid-template-columns: repeat(3, 1fr);
+      width: min(100% - 2.5rem, 80rem);
+      margin-inline: auto;
+      padding: 0;
+      overflow: visible;
+    }
+
+    .reviews__card:nth-child(1) {
+      rotate: -1.5deg;
+    }
+
+    .reviews__card:nth-child(2) {
+      rotate: 1deg;
+      translate: 0 2rem;
+    }
+
+    .reviews__card:nth-child(3) {
+      rotate: -0.5deg;
+    }
+  }
+</style>

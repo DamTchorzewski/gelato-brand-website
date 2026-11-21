@@ -1,0 +1,162 @@
+---
+// A dark band: three counters and two rows of ingredients that drift with the scroll (never by themselves).
+import { numbers } from "@/content/site";
+
+const rows = [numbers.ingredients, [...numbers.ingredients].reverse()];
+---
+
+<section class="numbers on-dark" aria-labelledby="numbers-title">
+  <div class="container-page section !pb-16">
+    <h2 id="numbers-title" class="numbers__title">
+      {numbers.title}
+    </h2>
+    <dl class="numbers__grid">
+      {numbers.items.map((stat) => (
+        <div class="numbers__item">
+          <dt class="numbers__label">{stat.label}</dt>
+          <dd class="numbers__value">
+            <span data-count={stat.value}>{stat.value}</span>
+            {stat.suffix}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+
+  <div class="numbers__ingredients">
+    <h3 class="sr-only">What goes in</h3>
+    <ul class="numbers__list">
+      {numbers.ingredients.map((item) => (
+        <li>{item}</li>
+      ))}
+    </ul>
+    <div class="numbers__marquee" aria-hidden="true">
+      {rows.map((row, r) => (
+        <div class="numbers__row" data-marquee={r % 2 === 0 ? "-1" : "1"}>
+          {[...row, ...row].map((item, i) => (
+            <span class:list={["numbers__chip", i % 3 === 1 && "numbers__chip--accent"]}>
+              {item}
+            </span>
+          ))}
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .numbers {
+    background: var(--color-cocoa);
+    color: var(--color-cream);
+    overflow: clip;
+  }
+
+  .numbers__title {
+    font-size: clamp(2.2rem, 4.8vw, 4rem);
+    max-width: 16ch;
+  }
+
+  .numbers__grid {
+    display: grid;
+    gap: 2.5rem;
+    margin-top: clamp(2.5rem, 6vw, 4.5rem);
+  }
+
+  .numbers__item {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 0.75rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgb(255 248 241 / 0.18);
+  }
+
+  .numbers__value {
+    font-family: var(--font-display);
+    font-variation-settings:
+      "SOFT" 100,
+      "WONK" 1;
+    font-weight: 700;
+    font-size: clamp(4rem, 9vw, 7.5rem);
+    line-height: 0.9;
+    letter-spacing: -0.03em;
+    color: var(--color-candy);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .numbers__label {
+    max-width: 18rem;
+    color: rgb(255 248 241 / 0.82);
+    font-size: 1.0625rem;
+  }
+
+  .numbers__ingredients {
+    padding-bottom: clamp(4rem, 9vw, 7rem);
+  }
+
+  /* Without motion the ingredients are a plain, wrapped list; with motion the drifting rows replace it visually. */
+  .numbers__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    width: min(100% - 2.5rem, 80rem);
+    margin-inline: auto;
+  }
+
+  .numbers__list li,
+  .numbers__chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.7rem 1.4rem;
+    border-radius: 999px;
+    border: 1.5px solid rgb(255 248 241 / 0.28);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .numbers__marquee {
+    display: none;
+  }
+
+  :global(.motion) .numbers__list {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  :global(.motion) .numbers__marquee {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .numbers__row {
+    display: flex;
+    gap: 1rem;
+    width: max-content;
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 3vw, 2.4rem);
+    font-style: italic;
+  }
+
+  .numbers__row[data-marquee="1"] {
+    margin-left: -40%;
+  }
+
+  .numbers__chip {
+    padding: 0.6rem 1.6rem;
+    font-weight: 500;
+  }
+
+  .numbers__chip--accent {
+    background: var(--color-raspberry);
+    border-color: var(--color-raspberry);
+    color: #fff;
+  }
+
+  @media (min-width: 768px) {
+    .numbers__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>

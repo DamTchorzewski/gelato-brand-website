@@ -1,0 +1,262 @@
+---
+// Three shops with hours and contacts. The map is a Google embed loaded only when the visitor asks for it.
+import { shops, telHref } from "@/content/site";
+import Icon from "@/components/Icon.astro";
+---
+
+<section id="shops" class="section shops" aria-labelledby="shops-title">
+  <div class="container-page">
+    <header class="shops__head">
+      <div>
+        <p class="eyebrow">{shops.eyebrow}</p>
+        <h2 id="shops-title" class="display mt-4">
+          {shops.title}
+        </h2>
+      </div>
+      <p class="lead max-w-md">{shops.lead}</p>
+    </header>
+
+    <ul class="shops__grid">
+      {shops.items.map((shop, i) => (
+        <li class="shops__card" data-reveal>
+          <p class:list={["shops__kind", shop.kind === "Food truck" && "shops__kind--truck"]}>
+            {shop.kind}
+          </p>
+          <h3 class="shops__city">{shop.city}</h3>
+          <p class="shops__area">
+            <Icon name="pin" size={18} />
+            {shop.area}
+          </p>
+          <dl class="shops__hours">
+            {shop.hours.map((row) => (
+              <div>
+                <dt>{row.days}</dt>
+                <dd>{row.time}</dd>
+              </div>
+            ))}
+          </dl>
+          <ul class="shops__contact">
+            <li>
+              <a href={telHref(shop.phone)}>
+                <Icon name="phone" size={18} />
+                {shop.phone}
+              </a>
+            </li>
+            <li>
+              <a href={`mailto:${shop.email}`}>
+                <Icon name="mail" size={18} />
+                {shop.email}
+              </a>
+            </li>
+          </ul>
+          <button
+            type="button"
+            class="btn btn-ghost shops__map-btn"
+            aria-haspopup="dialog"
+            aria-controls="map-dialog"
+            data-map={shop.map}
+            data-map-title={`${shop.kind} in ${shop.city}`}
+            data-map-index={i}
+          >
+            Show {shop.city} on the map
+          </button>
+        </li>
+      ))}
+    </ul>
+
+    <aside class="shops__franchise on-dark" aria-labelledby="franchise-title">
+      <div>
+        <h3 id="franchise-title" class="shops__franchise-title">
+          {shops.franchise.title}
+        </h3>
+        <p class="mt-3 max-w-xl text-[rgb(255_255_255/0.9)]">{shops.franchise.text}</p>
+      </div>
+      <a class="btn btn-light" href={shops.franchise.cta.href}>
+        {shops.franchise.cta.label}
+        <Icon name="arrow" size={18} />
+      </a>
+    </aside>
+  </div>
+
+  <dialog id="map-dialog" class="modal modal--map" aria-labelledby="map-title">
+    <div class="flex items-center justify-between gap-4 p-5 pl-6">
+      <h3 id="map-title" class="text-2xl" data-map-heading>
+        Map
+      </h3>
+      <button type="button" class="icon-btn" data-dialog-close>
+        <Icon name="close" size={20} />
+        <span class="sr-only">Close the map</span>
+      </button>
+    </div>
+    <div class="map-frame" data-map-frame></div>
+    <p class="px-6 py-4 text-sm text-[var(--color-cocoa-soft)]">
+      The map is loaded from Google Maps only after you open it.
+    </p>
+  </dialog>
+</section>
+
+<style>
+  .shops__head {
+    display: grid;
+    gap: 1.5rem;
+    align-items: end;
+    margin-bottom: clamp(2.5rem, 6vw, 4rem);
+  }
+
+  .shops__grid {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .shops__card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.75rem;
+    border-radius: 1.75rem;
+    background: #fff;
+    box-shadow:
+      inset 0 0 0 1px var(--color-line),
+      0 30px 50px -40px rgb(42 26 31 / 0.4);
+  }
+
+  .shops__kind {
+    align-self: flex-start;
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    background: var(--color-blush);
+    color: var(--color-raspberry-deep);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .shops__kind--truck {
+    background: #ffe7c2;
+    color: #7a4100;
+  }
+
+  .shops__city {
+    font-size: clamp(2.2rem, 4vw, 3rem);
+  }
+
+  .shops__area,
+  .shops__contact a {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .shops__area {
+    color: var(--color-cocoa-soft);
+  }
+
+  .shops__area :global(svg),
+  .shops__contact :global(svg) {
+    flex: none;
+    color: var(--color-raspberry-deep);
+  }
+
+  .shops__hours {
+    display: grid;
+    gap: 0.5rem;
+    padding-block: 1rem;
+    border-block: 1px solid var(--color-line);
+  }
+
+  .shops__hours div {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+    align-items: baseline;
+  }
+
+  .shops__hours dd {
+    text-align: right;
+  }
+
+  .shops__hours dt {
+    color: var(--color-cocoa-soft);
+  }
+
+  .shops__hours dd {
+    font-weight: 600;
+  }
+
+  .shops__contact {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .shops__contact a {
+    min-height: 2.75rem;
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: var(--color-line);
+    text-underline-offset: 4px;
+    word-break: break-word;
+  }
+
+  .shops__contact a:hover {
+    text-decoration-color: var(--color-raspberry);
+  }
+
+  .shops__map-btn {
+    margin-top: auto;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .shops__franchise {
+    display: grid;
+    gap: 1.5rem;
+    align-items: center;
+    margin-top: 2rem;
+    padding: clamp(1.75rem, 4vw, 3rem);
+    border-radius: 2rem;
+    background:
+      radial-gradient(80% 120% at 100% 0%, #e8336080, transparent 60%), var(--color-raspberry-deep);
+    color: #fff;
+  }
+
+  .shops__franchise-title {
+    font-size: clamp(1.9rem, 3.6vw, 3rem);
+    max-width: 20ch;
+  }
+
+  .modal--map {
+    width: min(100% - 2rem, 56rem);
+  }
+
+  .map-frame {
+    aspect-ratio: 4 / 3;
+    background: var(--color-cream-deep);
+  }
+
+  .map-frame :global(iframe) {
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  @media (min-width: 768px) {
+    .shops__head {
+      grid-template-columns: 1fr auto;
+    }
+
+    .shops__franchise {
+      grid-template-columns: 1fr auto;
+    }
+
+    .map-frame {
+      aspect-ratio: 16 / 9;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .shops__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>

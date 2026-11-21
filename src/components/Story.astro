@@ -1,0 +1,142 @@
+---
+// How it's made: the farm picture stays in view (desktop) while four steps go by; a line fills as they are read.
+import { Image } from "astro:assets";
+import { story } from "@/content/site";
+---
+
+<section id="story" class="section story" aria-labelledby="story-title">
+  <div class="container-page story__grid">
+    <div class="story__aside">
+      <p class="eyebrow">{story.eyebrow}</p>
+      <h2 id="story-title" class="display mt-4">
+        {story.title}
+      </h2>
+      <div class="story__media">
+        <Image
+          src={story.image}
+          alt={story.alt}
+          widths={[360, 560, 800, 1032]}
+          sizes="(min-width: 1024px) 40vw, 90vw"
+          format="webp"
+          quality={78}
+        />
+      </div>
+    </div>
+
+    <div class="story__flow" data-story-steps>
+      <span class="story__rail" aria-hidden="true">
+        <span data-story-line></span>
+      </span>
+      <ol class="story__steps">
+        {story.steps.map((step, i) => (
+          <li class="story__step" data-reveal>
+            <span class="story__num" aria-hidden="true">
+              {i + 1}
+            </span>
+            <h3 class="story__title">{step.title}</h3>
+            <p class="story__text">{step.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+</section>
+
+<style>
+  .story__grid {
+    display: grid;
+    gap: 3rem;
+  }
+
+  .story__media {
+    margin-top: 2rem;
+    max-width: 32rem;
+  }
+
+  .story__flow {
+    position: relative;
+  }
+
+  .story__steps {
+    display: grid;
+    gap: clamp(2.5rem, 6vw, 5rem);
+    padding-left: 4.25rem;
+  }
+
+  .story__rail {
+    position: absolute;
+    left: 1.4rem;
+    top: 0.5rem;
+    bottom: 0.5rem;
+    width: 3px;
+    border-radius: 3px;
+    background: var(--color-line);
+    overflow: hidden;
+  }
+
+  .story__rail span {
+    position: absolute;
+    inset: 0;
+    background: var(--color-raspberry);
+    transform-origin: 50% 0;
+  }
+
+  .story__step {
+    position: relative;
+  }
+
+  .story__num {
+    position: absolute;
+    left: -4.25rem;
+    top: -0.35rem;
+    display: grid;
+    place-items: center;
+    width: 2.9rem;
+    height: 2.9rem;
+    border-radius: 50%;
+    background: var(--color-cream);
+    box-shadow: inset 0 0 0 2px var(--color-raspberry);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--color-raspberry-deep);
+  }
+
+  .story__title {
+    font-size: clamp(1.75rem, 3.2vw, 2.6rem);
+  }
+
+  .story__text {
+    margin-top: 0.85rem;
+    max-width: 32rem;
+    color: var(--color-cocoa-soft);
+    font-size: 1.0625rem;
+  }
+
+  @media (min-width: 1024px) {
+    .story__grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+    }
+
+    .story__aside {
+      position: sticky;
+      top: calc(var(--header-h) + 2rem);
+      align-self: start;
+    }
+
+    .story__flow {
+      padding-top: 10rem;
+      padding-bottom: 6rem;
+    }
+
+    .story__rail {
+      top: 10.5rem;
+      bottom: 6.5rem;
+    }
+
+    .story__steps {
+      gap: 9rem;
+    }
+  }
+</style>
