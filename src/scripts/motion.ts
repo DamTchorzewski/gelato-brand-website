@@ -4,7 +4,7 @@
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
-import { stepAt } from "@/lib/steps";
+import { frameAt, loadOrder, nearestLoaded, stepAt } from "@/lib/steps";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -94,18 +94,18 @@ mm.add("(max-width: 1023px)", () => {
 });
 
 // ---------- Flavours: the cone is built scoop by scoop ----------
+// The scroll scrubs a rendered sequence (public/cone/<set>/f_NN.webp) on a canvas, and the current scoop's name and
+// colour follow it. The frames are fetched only when the scene comes near, coarse pass first.
 const flavours = document.querySelector<HTMLElement>("[data-flavours]");
 const track = flavours?.querySelector<HTMLElement>("[data-flavours-track]");
 if (flavours && track) {
   const items = [...flavours.querySelectorAll<HTMLElement>("[data-flavour]")];
   const marks = [...flavours.querySelectorAll<HTMLElement>("[data-progress]")];
-  const cone = flavours.querySelector<HTMLElement>(".flavours__cone");
-  const fills = items.map((item) => Number(item.dataset.fill));
+  const player = coneSequence(flavours.querySelector<HTMLElement>("[data-cone]"));
   let current = -1;
 
   const show = (index: number) => {
     if (index === current) return;
-    const adding = index > current;
     current = index;
     items.forEach((item, i) => item.toggleAttribute("data-active", i === index));
     marks.forEach((mark, i) => {
@@ -113,34 +113,98 @@ if (flavours && track) {
       mark.toggleAttribute("data-current", i === index);
     });
     flavours.style.setProperty("--bg", items[index]?.dataset.colour ?? "");
-    gsap.to(flavours, {
-      "--fill": fills[index] ?? 1,
-      duration: adding ? 0.85 : 0.5,
-      ease: adding ? "back.out(1.7)" : "power2.out",
-      overwrite: true,
-    });
-    if (adding && cone) {
-      gsap.fromTo(
-        cone,
-        { scaleY: 0.95, scaleX: 1.04 },
-        { scaleY: 1, scaleX: 1, duration: 0.7, ease: "elastic.out(1, 0.45)", overwrite: true },
-      );
-    }
   };
 
   ScrollTrigger.create({
     trigger: track,
     start: "top top",
     end: "bottom bottom",
-    onUpdate: (self) => show(stepAt(self.progress, items.length)),
+    onUpdate: (self) => {
+      show(stepAt(self.progress, items.length));
+      player?.seek(self.progress);
+    },
     onLeaveBack: () => {
       current = -1;
       items.forEach((item, i) => item.toggleAttribute("data-active", i === 0));
       marks.forEach((mark) => mark.removeAttribute("data-done"));
       flavours.style.removeProperty("--bg");
-      gsap.to(flavours, { "--fill": 0.26, duration: 0.4, overwrite: true });
+      player?.seek(0);
     },
   });
+}
+
+/** Loads the frames of the cone and draws the one that matches the scroll progress. */
+function coneSequence(box: HTMLElement | null) {
+  const canvas = box?.querySelector<HTMLCanvasElement>("[data-cone-canvas]");
+  const context = canvas?.getContext("2d");
+  const count = Number(box?.dataset.frames) || 0;
+  if (!box || !canvas || !context || !count) return null;
+
+  const set = window.matchMedia("(min-width: 1024px)").matches ? "desktop" : "mobile";
+  const base = `${box.dataset.framesSrc ?? ""}${set}/`;
+  const frames: (HTMLImageElement | undefined)[] = new Array(count);
+  const loaded: boolean[] = new Array(count).fill(false);
+  let wanted = 0;
+  let drawn = -1;
+
+  const fit = () => {
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(canvas.clientWidth * ratio);
+    canvas.height = Math.round(canvas.clientHeight * ratio);
+    drawn = -1;
+    draw();
+  };
+
+  const draw = () => {
+    const index = nearestLoaded(wanted, loaded);
+    const image = index >= 0 ? frames[index] : undefined;
+    if (!image || index === drawn) return;
+    drawn = index;
+    const scale = Math.min(canvas.width / image.naturalWidth, canvas.height / image.naturalHeight);
+    const w = image.naturalWidth * scale;
+    const h = image.naturalHeight * scale;
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(image, (canvas.width - w) / 2, canvas.height - h, w, h);
+    box.setAttribute("data-ready", "");
+  };
+
+  const load = async () => {
+    const queue = loadOrder(count, 8);
+    const worker = async () => {
+      for (let next = queue.shift(); next !== undefined; next = queue.shift()) {
+        const image = new Image();
+        image.decoding = "async";
+        image.src = `${base}f_${String(next + 1).padStart(2, "0")}.webp`;
+        try {
+          await image.decode();
+          frames[next] = image;
+          loaded[next] = true;
+          draw();
+        } catch {
+          // a frame that fails stays empty; its neighbours are drawn instead
+        }
+      }
+    };
+    await Promise.all([worker(), worker(), worker(), worker()]);
+  };
+
+  new IntersectionObserver(
+    (entries, observer) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      observer.disconnect();
+      fit();
+      void load();
+    },
+    { rootMargin: "150% 0px" },
+  ).observe(box);
+  new ResizeObserver(() => fit()).observe(canvas);
+
+  return {
+    seek(progress: number) {
+      wanted = frameAt(progress, count);
+      draw();
+    },
+  };
 }
 
 // ---------- Menu: a card sinks back as the next one slides over it ----------

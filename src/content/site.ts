@@ -30,8 +30,6 @@ export interface Flavour {
   note: string;
   /** Section background while this scoop is the current one. */
   colour: string;
-  /** Height of the cone image, from the bottom, that is shown once this scoop is on (0 to 1). */
-  fill: number;
 }
 
 export interface MenuItem {
@@ -103,7 +101,7 @@ export const hero = {
   primary: { label: "Taste the flavours", href: "#flavours" },
   secondary: { label: "Find a shop", href: "#shops" },
   image: cone,
-  alt: "A waffle cone stacked with five scoops (pistachio, mango, mint, salted caramel and raspberry) under a swirl of fior di latte",
+  alt: "A waffle cone stacked with five scoops (raspberry, salted caramel, mint, mango and pistachio) under a swirl of fior di latte",
   stats: [
     { value: 16, label: "cafés" },
     { value: 23, label: "food trucks" },
@@ -114,49 +112,44 @@ export const flavours = {
   eyebrow: "Five scoops, one cone",
   title: "Build the cone we're famous for",
   lead: "Scroll to stack it, scoop by scoop. Each flavour is churned in batches of twelve litres, so it never sits in the freezer for long.",
-  // Bottom to top, in the order they land on the cone. `fill` is measured on src/assets/hero/cone.png.
+  // Bottom to top, in the order they land on the cone (the order of the Blender frame sequence).
+  frames: { count: 96, path: "cone/" },
   items: [
     {
       id: "raspberry",
       name: "Raspberry sorbet",
       note: "Picked in Oregon, blended with a squeeze of lime. Dairy-free.",
       colour: "#ffd3dd",
-      fill: 0.41,
     },
     {
       id: "caramel",
       name: "Salted caramel",
       note: "Sugar cooked to amber, finished with flakes of sea salt.",
       colour: "#f9ddb5",
-      fill: 0.47,
     },
     {
       id: "mint",
       name: "Fresh mint",
       note: "Garden mint steeped overnight in cream. No green dye.",
       colour: "#cdeedd",
-      fill: 0.57,
     },
     {
       id: "mango",
       name: "Alphonso mango",
       note: "The sweetest mango there is, at its ripest in May.",
       colour: "#ffd9a6",
-      fill: 0.68,
     },
     {
       id: "pistachio",
       name: "Sicilian pistachio",
       note: "Bronte pistachios, roasted and ground in the shop.",
       colour: "#e4ebc0",
-      fill: 0.83,
     },
     {
       id: "cream",
       name: "Fior di latte",
       note: "Just milk, cream and a little sugar: the crown of every cone.",
       colour: "#fff1e2",
-      fill: 1,
     },
   ] satisfies Flavour[],
 };
@@ -177,7 +170,7 @@ export const menu = {
       price: "from $4.50",
       colour: "#ffd3dd",
       image: iceCream,
-      alt: "A scoop of strawberry ice cream with fresh strawberries",
+      alt: "A striped paper cup with a scoop of strawberry and a scoop of vanilla ice cream and a wafer",
     },
     {
       id: "ice-coffee",
@@ -191,7 +184,7 @@ export const menu = {
       price: "from $3.90",
       colour: "#f3dcc0",
       image: iceCoffee,
-      alt: "A tall glass of iced coffee with milk and a brown straw",
+      alt: "A tall glass of iced coffee over milk, with ice cubes and a brown straw",
     },
     {
       id: "milkshakes",
@@ -205,7 +198,7 @@ export const menu = {
       price: "from $6.20",
       colour: "#dcebc4",
       image: milkshake,
-      alt: "A chocolate milkshake topped with whipped cream, cookies, marshmallows and a praline",
+      alt: "A chocolate milkshake topped with whipped cream, a cherry, a cookie and a striped straw",
     },
   ] satisfies MenuItem[],
 };
