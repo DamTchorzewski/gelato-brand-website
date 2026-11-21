@@ -51,8 +51,8 @@ import Icon from "@/components/Icon.astro";
         <Image
           src={hero.image}
           alt={hero.alt}
-          widths={[240, 360, 472]}
-          sizes="(min-width: 1024px) 400px, (min-width: 640px) 34vw, 52vw"
+          widths={[220, 330, 445]}
+          sizes="(min-width: 1024px) 300px, (min-width: 640px) 26vw, 32vw"
           loading="eager"
           fetchpriority="high"
           format="webp"
@@ -170,7 +170,7 @@ import Icon from "@/components/Icon.astro";
 
   .hero__cone {
     position: relative;
-    width: min(clamp(10.5rem, 34vw, 25rem), 30svh);
+    width: min(clamp(9rem, 26vw, 19rem), 23svh);
     filter: drop-shadow(0 40px 40px rgb(120 20 50 / 0.28));
   }
 
@@ -276,7 +276,7 @@ import Icon from "@/components/Icon.astro";
     }
 
     .hero__cone {
-      width: min(40vw, 28svh, 15rem);
+      width: min(32vw, 21svh, 11.5rem);
     }
 
     .hero__disc {

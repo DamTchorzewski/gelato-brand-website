@@ -49,9 +49,9 @@ A colour change needs the pair measured again; `pnpm test:e2e` fails on any axe 
 - `src/scripts/motion.ts` (GSAP, ScrollTrigger, Lenis) is imported by `main.ts` when the browser is idle, so it never
   delays the first paint. If it fails to load, `motion` is removed and the plain layout comes back.
 - **Cone scene:** the track is `steps × 70svh + 100svh` tall and the stage sticks. The scroll progress picks the
-  current scoop (`stepAt` in `src/lib/steps.ts`, unit-tested); the cone image is masked from the bottom by
-  `--fill` (each flavour's `fill` in `site.ts` is measured on `src/assets/hero/cone.png`), tweened with a
-  `back.out` ease and a small squash, and the background moves to the flavour's colour.
+  frame of the rendered sequence drawn on a canvas (`frameAt`) and the current scoop (`stepAt`, both unit-tested in
+  `src/lib/steps.ts`); the scoops fall, squash and settle in the render itself, and the background moves to the
+  flavour's colour.
 - **Menu:** the cards stack with CSS `position: sticky` (no script); with motion a card sinks back to 93 % while the
   next one slides over it.
 - **Story, reviews, shops:** a rail fills while the steps are read; cards rise in once.
@@ -79,17 +79,24 @@ A colour change needs the pair measured again; `pnpm test:e2e` fails on any axe 
   `loading="eager"` and `fetchpriority="high"`, everything else is lazy.
 - Fonts: two variable files per family at most, the subsets the text needs.
 
-## Graphics still to make
+## Graphics
 
-The page runs on the photos of the earlier `food-brand-landing-page` project. Planned, for a design chat and Blender
-(`blender-projects/gelato-brand-website`):
+The cone, its frame sequence and the three products are rendered in Blender 5.2 from code, in
+`blender-projects/gelato-brand-website` (`build_cone.py`, `render_products.py`; see that folder's README). The site holds
+only the finished files:
 
-| What                                                                             | For                     | Format                                        |
-| -------------------------------------------------------------------------------- | ----------------------- | --------------------------------------------- |
-| Cone with six scoops (raspberry, caramel, mint, mango, pistachio, fior di latte) | hero, Open Graph image  | PNG with alpha, 2400 px tall                  |
-| Scoops dropping onto the cone, camera slowly orbiting, ~120-150 frames           | the cone scene          | frames with alpha → WebP/AVIF, 1080p and 720p |
-| Product renders: iced coffee, milkshake, cup                                     | menu cards and dialogs  | PNG with alpha, 1400 px                       |
-| Vector logo (the current mark is drawn in `Logo.astro`)                          | header, favicon, README | SVG, horizontal lockup                        |
+| File                               | What                                                                        | Made by                        |
+| ---------------------------------- | --------------------------------------------------------------------------- | ------------------------------ |
+| `public/cone/desktop/f_01…96.webp` | the cone scene, 96 frames, 450 × 900 with alpha (about 1.25 MB in all)      | `scripts/cone-frames.mjs`      |
+| `public/cone/mobile/f_01…96.webp`  | the same at 300 × 600 for screens under 1024 px (about 0.75 MB)             | `scripts/cone-frames.mjs`      |
+| `src/assets/hero/cone.png`         | the finished cone, trimmed, 1400 px tall: hero and the static cone scene    | `scripts/cone-frames.mjs`      |
+| `src/assets/menu/*.png`            | cup of ice cream, iced coffee, milkshake (1000 px, alpha)                   | `render_products.py`           |
+| `public/brand/velluto-logo*.svg`   | the logo lockup with the word outlined (dark and light), and the mark alone | Fraunces 700, SOFT 100, WONK 1 |
+| `public/og.jpg`                    | the Open Graph image (1200 × 630) with the rendered cone                    | sharp, by hand                 |
 
-The cone scene reads its progress from one place (`stepAt` and the `--fill` variable), so a frame sequence can replace
-the masked photo without touching the rest of the page.
+The frames are fetched only when the cone scene comes within one and a half screens, the first, the last and every
+eighth frame first (`loadOrder` in `src/lib/steps.ts`), four at a time; until a frame is in, its nearest loaded
+neighbour is drawn. Without motion the page never loads them.
+
+To change the cone: edit the Blender scripts, render the frames and the still, then from this repo
+`node scripts/cone-frames.mjs <frames folder> <cone-still.png>`.

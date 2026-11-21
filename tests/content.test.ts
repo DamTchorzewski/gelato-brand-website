@@ -1,4 +1,6 @@
 // Checks the content file, so a typo in src/content/site.ts fails here and not on the live page.
+import { readdirSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   flavours,
@@ -26,11 +28,14 @@ describe("site content", () => {
     expect(nav.map((link) => link.href)).toEqual(["#flavours", "#menu", "#story", "#shops"]);
   });
 
-  it("stacks the flavours from the bottom up, ending with the full cone", () => {
-    const fills = flavours.items.map((item) => item.fill);
-    for (let i = 1; i < fills.length; i++) expect(fills[i]).toBeGreaterThan(fills[i - 1] ?? 0);
-    expect(fills.at(-1)).toBe(1);
+  it("has a colour for every flavour and a frame sequence that exists", () => {
     for (const item of flavours.items) expect(item.colour).toMatch(/^#[0-9a-f]{6}$/i);
+    for (const set of ["desktop", "mobile"]) {
+      const dir = join("public", flavours.frames.path, set);
+      const files = readdirSync(dir).filter((f) => f.endsWith(".webp"));
+      expect(files).toHaveLength(flavours.frames.count);
+      expect(files).toContain(`f_${String(flavours.frames.count).padStart(2, "0")}.webp`);
+    }
   });
 
   it("uses unique ids for the flavours and the menu dialogs", () => {

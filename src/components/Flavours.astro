@@ -1,10 +1,11 @@
 ---
 // The signature moment: a pinned stage where the cone is built scoop by scoop while the page scrolls.
-// With motion: the track is tall, the stage sticks, src/scripts/motion.ts maps the scroll to the current scoop
-// (--fill masks the cone image from the bottom, the background takes the flavour's colour).
-// Without motion (or without JavaScript): the full cone next to the list of all six flavours.
+// With motion: the track is tall, the stage sticks and src/scripts/motion.ts scrubs a rendered frame sequence
+// (public/cone/, made in blender-projects/gelato-brand-website) on the canvas; the background takes the flavour's colour.
+// Without motion (or without JavaScript): the finished cone next to the list of all six flavours.
 import { Image } from "astro:assets";
 import { flavours, hero } from "@/content/site";
+import { withBase } from "@/lib/url";
 
 const count = flavours.items.length;
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -30,27 +31,23 @@ const pad = (n: number) => String(n).padStart(2, "0");
 
         <div class="flavours__visual">
           <div class="flavours__disc" aria-hidden="true"></div>
-          <div class="flavours__cone">
+          <div
+            class="flavours__cone"
+            data-cone
+            data-frames={flavours.frames.count}
+            data-frames-src={withBase(flavours.frames.path)}
+          >
             <Image
-              class="flavours__ghost"
-              src={hero.image}
-              alt=""
-              widths={[240, 360, 472]}
-              sizes="(min-width: 1024px) 300px, 40vw"
-              format="webp"
-              quality={70}
-              loading="lazy"
-            />
-            <Image
-              class="flavours__fill"
+              class="flavours__still"
               src={hero.image}
               alt="The finished cone: raspberry, salted caramel, mint, mango and pistachio under fior di latte"
-              widths={[240, 360, 472]}
-              sizes="(min-width: 1024px) 300px, 40vw"
+              widths={[220, 330, 445]}
+              sizes="(min-width: 1024px) 320px, 45vw"
               format="webp"
-              quality={82}
+              quality={80}
               loading="lazy"
             />
+            <canvas class="flavours__canvas" aria-hidden="true" data-cone-canvas></canvas>
           </div>
         </div>
 
@@ -59,7 +56,6 @@ const pad = (n: number) => String(n).padStart(2, "0");
             <li
               class="flavours__item"
               data-flavour={i}
-              data-fill={item.fill}
               data-colour={item.colour}
               data-active={i === 0 ? "" : undefined}
             >
@@ -90,7 +86,6 @@ const pad = (n: number) => String(n).padStart(2, "0");
   /* ---------- Static layout (reduced motion, no JavaScript) ---------- */
   .flavours {
     --bg: var(--color-cream-deep);
-    --fill: 1;
     background: var(--bg);
     transition: background-color 0.7s var(--ease-out-soft);
   }
@@ -132,30 +127,18 @@ const pad = (n: number) => String(n).padStart(2, "0");
   .flavours__cone {
     position: relative;
     display: grid;
-    width: clamp(9rem, 28vw, 15rem);
+    width: clamp(7rem, 20vw, 11rem);
     filter: drop-shadow(0 30px 30px rgb(80 30 40 / 0.22));
   }
 
-  .flavours__cone :global(img) {
+  .flavours__cone :global(img),
+  .flavours__canvas {
     grid-area: 1 / 1;
     width: 100%;
   }
 
-  .flavours__ghost {
-    opacity: 0;
-  }
-
-  .flavours__fill {
-    -webkit-mask-image: linear-gradient(
-      to top,
-      #000 calc(var(--fill) * 100%),
-      transparent calc(var(--fill) * 100% + 3%)
-    );
-    mask-image: linear-gradient(
-      to top,
-      #000 calc(var(--fill) * 100%),
-      transparent calc(var(--fill) * 100% + 3%)
-    );
+  .flavours__canvas {
+    display: none;
   }
 
   .flavours__items {
@@ -233,27 +216,47 @@ const pad = (n: number) => String(n).padStart(2, "0");
     overflow: clip;
   }
 
-  :global(.motion) .flavours {
-    --fill: 0.26;
-  }
-
   :global(.motion) .flavours__grid {
     height: 100%;
     grid-template-rows: auto minmax(0, 1fr) auto;
     gap: 1rem;
   }
 
-  :global(.motion) .flavours__ghost {
-    opacity: 0.14;
-    filter: grayscale(1);
+  /* The frames are 1 : 2; the box gets a fixed size so the canvas and the still line up exactly. */
+  :global(.motion) .flavours__cone {
+    --cone-h: min(100%, 50svh, 30rem);
+    display: block;
+    height: var(--cone-h);
+    width: auto;
+    aspect-ratio: 1 / 2;
   }
 
-  :global(.motion) .flavours__cone {
-    width: auto;
+  :global(.motion) .flavours__canvas,
+  :global(.motion) .flavours__still {
+    position: absolute;
+    inset: 0;
+    width: 100%;
     height: 100%;
-    max-height: 34rem;
-    aspect-ratio: 472 / 1114;
-    transform-origin: 50% 100%;
+    transition: opacity 0.4s;
+  }
+
+  :global(.motion) .flavours__canvas {
+    display: block;
+    opacity: 0;
+  }
+
+  :global(.motion) .flavours__still {
+    object-fit: contain;
+    object-position: 50% 100%;
+    padding-top: 6%;
+  }
+
+  :global(.motion) .flavours__cone[data-ready] .flavours__canvas {
+    opacity: 1;
+  }
+
+  :global(.motion) .flavours__cone[data-ready] .flavours__still {
+    opacity: 0;
   }
 
   :global(.motion) .flavours__visual {
@@ -349,7 +352,7 @@ const pad = (n: number) => String(n).padStart(2, "0");
     }
 
     :global(.motion) .flavours__cone {
-      max-height: min(40rem, 78svh);
+      height: min(44rem, 82svh);
     }
 
     :global(.motion) .flavours__progress {
